@@ -1,0 +1,23 @@
+{
+  "name": "piTorrent",
+  "version": "1.0.0",
+  "description": "Simple torrent client for raspberry pi",
+  "main": "index.js",
+  "dependencies": {
+    "webtorrent": "^0.27.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IngenieroFiestero/piTorrent.git"
+  },
+  "author": "Samuel Garces",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IngenieroFiestero/piTorrent/issues"
+  },
+  "homepage": "https://github.com/IngenieroFiestero/piTorrent"
+}
