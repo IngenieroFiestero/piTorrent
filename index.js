@@ -22,12 +22,6 @@ function showTorrentList(){
   });
   console.log("----------");
 }
-function comprobeHash(hash){
-  client.torrents.forEach(function(val,i){
-    if(client.torrents[i].infoHash == hash)
-    console.log(client.torrents[i].infoHash);
-  });
-}
 
 function onTorrent(torrent){
   torrent.porcentaje = 0;
