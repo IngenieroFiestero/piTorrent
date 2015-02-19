@@ -26,8 +26,7 @@ function onTorrent(torrent){
   });
   console.log("Progreso: empezando...");
   torrent.on('download', function(){
-    var progress = (100 * torrent.downloaded / torrent.parsedTorrent.length).toFixed(1);
-    logReplace('Progreso: ' + progress + '% -- download speed: ' + prettysize(torrent.swarm.downloadSpeed()));
+    console.log("Descargado");
   });
 };
 
