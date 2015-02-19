@@ -14,14 +14,26 @@ var client = new WebTorrent();
 var port= 3000;
 //Configurar torrent cliente
 
-client.on('torrent',function(torrent){
+function onTorrent(torrent){
   console.log("Descargando un nuevo torrent: " + torrent.name);
-});
+  torrent.files.forEach(function (file) {
+    // Stream each file to the disk
+    var source = file.createReadStream();
+    fs.mkdir("./files/"+ torrent.name, function(){
+      var destination = fs.createWriteStream("./files/"+ torrent.name + "/" + file.name);
+      source.pipe(destination);
+    });
+  });
+  console.log("Progreso: empezando...");
+  torrent.on('download', function(){
+    var progress = (100 * torrent.downloaded / torrent.parsedTorrent.length).toFixed(1);
+    logReplace('Progreso: ' + progress + '% -- download speed: ' + prettysize(torrent.swarm.downloadSpeed()));
+  });
+};
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.set('port', port);
 
 app.use(logger('combined'));
 app.use(bodyParser.json());
@@ -37,16 +49,7 @@ app.get('/', function(req, res, next) {
 //Post de la pagina principal
 app.post('/',function(req, res, next){
   if(req.body.newTorrentLink){
-    client.add(req.body.newTorrentLink, function (torrent) {
-      torrent.files.forEach(function (file) {
-        // Stream each file to the disk
-        var source = file.createReadStream();
-        fs.mkdir("./files/"+ torrent.name, function(){
-          var destination = fs.createWriteStream("./files/"+ torrent.name + "/" + file.name);
-          source.pipe(destination);
-        });
-      });
-    });
+    client.add(req.body.newTorrentLink, onTorrent);
   }
   res.render('index',{title:'Express'});
 });
