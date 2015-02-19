@@ -21,6 +21,7 @@ client.on('torrent',function(torrent){
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.set('port', port);
 
 app.use(logger('combined'));
 app.use(bodyParser.json());
@@ -49,7 +50,8 @@ app.post('/',function(req, res, next){
   }
   res.render('index',{title:'Express'});
 });
-http.createServer(app).listen(port);
-app.on('listening', function(){
+server = http.createServer(app);
+server.listen(port);
+server.on('listening', function(){
   console.log("Servidor escuchando en el puerto " + port);
 });
