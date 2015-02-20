@@ -2,8 +2,14 @@ doctype html
 html
   head
     title= title
+    script(src='/angular.min.js')
   body
     h3 Escribe la url del torrent
     form(method="post")
       input(type="text" name="newTorrentLink" required)
       input(type="submit" value="Enviar")
+    h3 Lista de torrents
+    ul
+      each vec in vector
+        each por in porcent
+          li #{vec}  --  #{por} %

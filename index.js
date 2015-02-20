@@ -14,6 +14,8 @@ var client = new WebTorrent();
 
 var port= 3000;
 //Configurar torrent cliente
+var vector = [];
+var porcent = [];
 
 function showTorrentList(){
   console.log("Lista de torrents: ");
@@ -21,9 +23,19 @@ function showTorrentList(){
     console.log(client.torrents[i].name + " -- Descargado: " + (100*client.torrents[i].downloaded / client.torrents[i].parsedTorrent.length).toFixed(1) +" %");
   });
   console.log("----------");
-}
+};
+function generateVector(){
+  vector = [];
+  porcent = [];
+  client.torrents.forEach(function(val,i){
+    vector.push(client.torrents[i].name);
+    var porcentaje = (100*client.torrents[i].downloaded / client.torrents[i].parsedTorrent.length).toFixed(1);
+    porcent.push(porcentaje);
+  });
+};
 
 function onTorrent(torrent){
+  generateVector();
   torrent.porcentaje = 0;
   console.log("Descargando un nuevo torrent: " + torrent.name);
   console.log("----------");
@@ -36,6 +48,7 @@ function onTorrent(torrent){
     });
   });
   torrent.swarm.on('download', function(){
+    generateVector();
     var progress = (100 * torrent.downloaded / torrent.parsedTorrent.length).toFixed(1);
     if(progress >= 100 && torrent.porcentaje < 100){
       showTorrentList();
@@ -65,7 +78,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Obtener pagina principal
 app.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', {vector : vector, porcent : porcent, title : 'My own cloud torrent'});
 });
 
 //Post de la pagina principal
@@ -73,7 +86,7 @@ app.post('/',function(req, res, next){
   if(req.body.newTorrentLink){
     client.add(req.body.newTorrentLink, onTorrent);
   };
-  res.render('index',{title:'Express'});
+  res.redirect('/');
 });
 server = http.createServer(app);
 server.listen(port);
