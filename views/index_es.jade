@@ -4,18 +4,18 @@ html
     title= title
     script(src='/angular.min.js')
   body
-    h3 Write Torrent URL
+    h3 Escribe la URL del torrent
     form(method="post")
       input(type="text" name="newTorrentLink" required)
-      input(type="submit" value="Send")
-    h3 List of torrents
+      input(type="submit" value="Enviar")
+    h3 Lista de torrents
     ul
       each vec in vector
         each por in porcent
           li #{vec}  --  #{por} %
-    h3 Configuration
+    h3 Configuracion
     form(method="post")
       select(name='idiom')
         option(value="en") English
         option(value="es") Español
-      input(type="submit" value="Send")
+      input(type="submit" value="Enviar")

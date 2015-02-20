@@ -78,14 +78,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Obtener pagina principal
 app.get('/', function(req, res, next) {
-  res.render('index', {vector : vector, porcent : porcent, title : 'My own cloud torrent'});
-});
+  if(req.cookies.idiom == 'es'){
+    res.render('index_es', {vector : vector, porcent : porcent, title : 'My own cloud torrent'});
+  }else{
+    res.render('index', {vector : vector, porcent : porcent, title : 'My own cloud torrent'});
+  }
+  });
 
 //Post de la pagina principal
 app.post('/',function(req, res, next){
   if(req.body.newTorrentLink){
     client.add(req.body.newTorrentLink, onTorrent);
   };
+  var miliseconds = 60000000;
+	res.cookie('idiom',req.body.idiom,{ maxAge: miliseconds });
   res.redirect('/');
 });
 server = http.createServer(app);
