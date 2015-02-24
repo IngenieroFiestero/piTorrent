@@ -8,6 +8,7 @@ var WebTorrent = require('webtorrent');
 var fs = require('fs');
 var http = require('http');
 var Torrent = require('./node_modules/webtorrent/lib/torrent');
+var io = require('socket.io');
 
 var idiom ={};
 var app = express();
@@ -25,17 +26,16 @@ function showTorrentList(){
   console.log("----------");
 };
 function generateVector(){
-  vector.nombre = [];
-  vector.porcent = [];
+  vector = [];
   client.torrents.forEach(function(val,i){
-    vector.nombre.push(client.torrents[i].name);
     var porcentaje = (100*client.torrents[i].downloaded / client.torrents[i].parsedTorrent.length).toFixed(1);
-    vector.porcent.push(porcentaje);
+    vector.push(client.torrents[i].name + " -- " + porcentaje + " %");
   });
 };
 
 function onTorrent(torrent){
   generateVector();
+  websocket.emit('torrentList', JSON.stringify(vector));
   torrent.porcentaje = 0;
   console.log("Descargando un nuevo torrent: " + torrent.name);
   console.log("----------");
@@ -63,6 +63,7 @@ function onTorrent(torrent){
       showTorrentList();
       torrent.porcentaje = 75;
     };
+    websocket.emit('torrentList', JSON.stringify(vector));
   });
 };
 
@@ -79,11 +80,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Obtener pagina principal
 app.get('/', function(req, res, next) {
   if(req.cookies.idiom == 'es'){
-    res.render('index', {vector : vector, title : 'My own cloud torrent', 'idiom': idiom.es});
+    res.render('index', {'vector' : vector, 'idiom': idiom.es});
   }else if(req.cookies.idiom == 'en'){
-    res.render('index', {vector : vector, title : 'My own cloud torrent', 'idiom' : idiom.en});
+    res.render('index', {'vector' : vector, 'idiom' : idiom.en});
   }else{
-    res.render('index', {vector : vector, title : 'My own cloud torrent', 'idiom' : idiom.en});
+    res.render('index', {'vector' : vector, 'idiom' : idiom.en});
   }
 });
 
@@ -92,11 +93,18 @@ app.post('/',function(req, res, next){
   if(req.body.newTorrentLink){
     client.add(req.body.newTorrentLink, onTorrent);
   };
+  var idiom = {};
+  if(req.body.idiom == 'es'){
+    idiom = 'es';
+  }else if(req.body.idiom == 'es'){
+    idiom = 'en';
+  }
   var miliseconds = 60000000;
-	res.cookie('idiom',req.body.idiom,{ maxAge: miliseconds });
+	res.cookie('idiom',idiom,{ maxAge: miliseconds });
   res.redirect('/');
 });
 loadConfig();
+var webSocket;
 function loadConfig(){
   fs.readFile("./idioms.json", function(error, data){
     if(error){
@@ -105,11 +113,18 @@ function loadConfig(){
       idiom = JSON.parse(data);
       console.log("Paquetes de idiomas cargados");
       server = http.createServer(app);
+      websocket = io.listen(server);
       server.listen(port);
       server.on('listening', function(){
+        websocket.on('connection', function(socket){
+          console.log("Nuevo usuario");
+          socket.on('newTorrent', function(msg){
+            client.add(msg, onTorrent);
+          });
+        });
         console.log("Servidor escuchando en el puerto " + port);
+
       });
     }
   });
-
 }

@@ -1,20 +1,22 @@
 doctype html
 html
   head
-    title= title
+    title #{idiom.title}
+    script(src="/socket.io-1.2.0.js")
+    script(src="/jquery-1.11.2.min.js")
+    script(src="/script.js")
   body
     h3 #{idiom.menu}
-    form(method="post")
-      input(type="text" name="newTorrentLink" required)
-      input(type="submit" value= "#{idiom.send}")
+    input(type="text" name="newTorrentLink" id="nTorrent")
+    button(id="eTorrent" onClick="enviarTorrent()") #{idiom.send}
     h3 #{idiom.list}
-    ul
-      each vec in vector
-        each por in porcent
-          li #{vec}  --  #{por} %
+    ul(id="list")
+      each val, i in vector
+        li= val
     h3 #{idiom.config}
-    form(method="post")
-      select(name='idiom')
+    form(method="POST")
+      select(name='idiom' id="leng")
+        option(value="") 
         option(value="en") English
         option(value="es") Español
-      input(type="submit" value= "#{idiom.send}")
+      input(type="submit" value="#{idiom.send}")
