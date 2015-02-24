@@ -2,20 +2,19 @@ doctype html
 html
   head
     title= title
-    script(src='/angular.min.js')
   body
-    h3 Write Torrent URL
+    h3 #{idiom.menu}
     form(method="post")
       input(type="text" name="newTorrentLink" required)
-      input(type="submit" value="Send")
-    h3 List of torrents
+      input(type="submit" value= "#{idiom.send}")
+    h3 #{idiom.list}
     ul
       each vec in vector
         each por in porcent
           li #{vec}  --  #{por} %
-    h3 Configuration
+    h3 #{idiom.config}
     form(method="post")
       select(name='idiom')
         option(value="en") English
         option(value="es") Español
-      input(type="submit" value="Send")
+      input(type="submit" value= "#{idiom.send}")

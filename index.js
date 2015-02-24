@@ -9,13 +9,13 @@ var fs = require('fs');
 var http = require('http');
 var Torrent = require('./node_modules/webtorrent/lib/torrent');
 
+var idiom ={};
 var app = express();
 var client = new WebTorrent();
 
 var port= 3000;
 //Configurar torrent cliente
 var vector = [];
-var porcent = [];
 
 function showTorrentList(){
   console.log("Lista de torrents: ");
@@ -25,12 +25,12 @@ function showTorrentList(){
   console.log("----------");
 };
 function generateVector(){
-  vector = [];
-  porcent = [];
+  vector.nombre = [];
+  vector.porcent = [];
   client.torrents.forEach(function(val,i){
-    vector.push(client.torrents[i].name);
+    vector.nombre.push(client.torrents[i].name);
     var porcentaje = (100*client.torrents[i].downloaded / client.torrents[i].parsedTorrent.length).toFixed(1);
-    porcent.push(porcentaje);
+    vector.porcent.push(porcentaje);
   });
 };
 
@@ -70,7 +70,7 @@ function onTorrent(torrent){
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(logger('combined'));
+app.use(logger('short'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -79,11 +79,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Obtener pagina principal
 app.get('/', function(req, res, next) {
   if(req.cookies.idiom == 'es'){
-    res.render('index_es', {vector : vector, porcent : porcent, title : 'My own cloud torrent'});
+    res.render('index', {vector : vector, title : 'My own cloud torrent', 'idiom': idiom.es});
+  }else if(req.cookies.idiom == 'en'){
+    res.render('index', {vector : vector, title : 'My own cloud torrent', 'idiom' : idiom.en});
   }else{
-    res.render('index', {vector : vector, porcent : porcent, title : 'My own cloud torrent'});
+    res.render('index', {vector : vector, title : 'My own cloud torrent', 'idiom' : idiom.en});
   }
-  });
+});
 
 //Post de la pagina principal
 app.post('/',function(req, res, next){
@@ -94,8 +96,20 @@ app.post('/',function(req, res, next){
 	res.cookie('idiom',req.body.idiom,{ maxAge: miliseconds });
   res.redirect('/');
 });
-server = http.createServer(app);
-server.listen(port);
-server.on('listening', function(){
-  console.log("Servidor escuchando en el puerto " + port);
-});
+loadConfig();
+function loadConfig(){
+  fs.readFile("./idioms.json", function(error, data){
+    if(error){
+      console.log("Error leyendo los paquetes de idiomas");
+    }else{
+      idiom = JSON.parse(data);
+      console.log("Paquetes de idiomas cargados");
+      server = http.createServer(app);
+      server.listen(port);
+      server.on('listening', function(){
+        console.log("Servidor escuchando en el puerto " + port);
+      });
+    }
+  });
+
+}

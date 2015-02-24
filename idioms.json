@@ -1,0 +1,17 @@
+{
+  "en" : {
+    "title": "Add torrent",
+    "menu": "Add torrent url",
+    "send": "Send",
+    "list": "Torrent list",
+    "config": "Seetings"
+  },
+  "es" : {
+    "title": "Añadir Torrent",
+    "menu": "Añade una URL",
+    "send": "Enviar",
+    "list": "Lista Torrents",
+    "config": "Configuracion"
+    }
+
+}
